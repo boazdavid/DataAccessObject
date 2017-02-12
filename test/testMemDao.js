@@ -5,9 +5,6 @@ const chai = require('chai');
 const chaiAsPromised = require("chai-as-promised");
 chai.use(chaiAsPromised);
 
-const fs = require('fs');
-const path = require('path');
-const tmpDir = 'tmp';
 const MemDao = require('../src/MemDAO');
 
 describe('MemDao', () => {
@@ -40,7 +37,11 @@ describe('MemDao', () => {
 				});
 			});
 		});
+	});
 
+	it('BadReq', () => {
+		const dao = new MemDao('CAR');
+		return assert.isRejected(dao.get(123));
 	});
 
 });

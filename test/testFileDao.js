@@ -42,17 +42,28 @@ describe('FileDao', () => {
 		return deleteFolderRecursive(this.folder);
 	});
 
-	it('create', () => {
-		console.log('in')
+	it('CRUD', () => {
 		const dao = new FileDao('CAR', this.folder, id=>`${id}.json`, nm=>nm.substr(0, nm.indexOf('.json')));
 		
 		const car = {size:4, owner:{ id: 'abc'}};
 		const carId = 12;
 		return dao.put(carId, car).then(()=>{
 			const filePath = `${this.folder}${path.sep}${carId}.json`;
-			assert(fs.existsSync(filePath));
+			assert(fs.existsSync(filePath));//file created
 			return dao.list().then(([nm1])=>{
 				assert.equal(nm1, carId);
+				return dao.get(carId)
+				.then(obj=>{
+					assert.equal(car.size, obj.size);
+					assert.equal(car.owner.id, obj.owner.id);
+					return dao.remove(carId)
+					.then(()=>{
+						assert(!fs.existsSync(filePath));
+						return dao.list().then(nms=>{
+							assert.equal(nms.length, 0);
+						})
+					})
+				});
 			});
 		});
 
